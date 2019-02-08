@@ -8,11 +8,16 @@ public class PlayerDataManager : PersistentSingleton<PlayerDataManager>
     #region getseter
     public int Stemina
     {
-        get { return _stemina; }
+        get {
+            _stemina = PlayerPrefs.GetInt("Stemina");
+            return _stemina;
+        }
         set
         {
             _stemina = value;
-            PlayerMoneyUI.SetSteminaUI(_stemina, MaxStemina);
+            PlayerPrefs.SetInt("Stemina", value);
+            PlayerPrefs.Save();
+            MoneyUI.SetSteminaUI(_stemina, MaxStemina);
 
             // 모든 스태미너 풀로 채워짐
             if (_stemina > MaxStemina)
@@ -24,34 +29,52 @@ public class PlayerDataManager : PersistentSingleton<PlayerDataManager>
 
     public int Gold
     {
-        get { return _gold; }
+        get
+        {
+            _gold = PlayerPrefs.GetInt("Gold");
+            return _gold;
+        }
         set
         {
-            PlayerMoneyUI.SetGoldUI(_gold);
             _gold = value;
+            PlayerPrefs.SetInt("Gold", value);
+            PlayerPrefs.Save();
+            MoneyUI.SetGoldUI(_gold);
         }
     }
 
     public int Cash
     {
-        get { return _cash; }
+        get
+        {
+            _cash = PlayerPrefs.GetInt("Cash");
+            return _cash;
+        }
         set
         {
-            PlayerMoneyUI.SetCashUI(_cash);
             _cash = value;
+            PlayerPrefs.SetInt("Cash", value);
+            PlayerPrefs.Save();
+            MoneyUI.SetCashUI(_cash);
         }
     }
 
     public DateTime SteminaUpdateTime
     {
-        get { return _steminaUpdateTime; }
+        get
+        {
+            _steminaUpdateTime = DateTime.Parse(PlayerPrefs.GetString("SteminaTime"));
+            return _steminaUpdateTime;
+        }
         set
         {
             _steminaUpdateTime = value;
+            PlayerPrefs.SetString("SteminaTime", value.ToString());
+            PlayerPrefs.Save();
         }
     }
 
-    public PlayerMoneyUI PlayerMoneyUI
+    public PlayerMoneyUI MoneyUI
     {
         get
         {
@@ -75,8 +98,12 @@ public class PlayerDataManager : PersistentSingleton<PlayerDataManager>
 
     protected override void Initialize()
     {
-        steminaChargeTime = new TimeSpan(0, 10, 0);
+        steminaChargeTime = new TimeSpan(0, 0, 10);
+
         FirstSetting();
+        MoneyUI.SetSteminaUI(Stemina, MaxStemina);
+        MoneyUI.SetGoldUI(Gold);
+        MoneyUI.SetCashUI(Cash);
         /*
         if(!ES3.KeyExists("FirstRun"))
         {
@@ -92,18 +119,19 @@ public class PlayerDataManager : PersistentSingleton<PlayerDataManager>
 
     private void FirstSetting()
     {
-        Stemina = MaxStemina - 3;
+        PlayerPrefs.DeleteAll();
+        Stemina = 1;
         SteminaUpdateTime = DateTime.Now;
-        Gold = 10000;
+        Gold = 1000;
         Cash = 500;
     }
 
     private void Update()
     {
         currentTime = DateTime.Now;
-        if (PlayerMoneyUI != null)
+        if (MoneyUI != null)
         {
-            PlayerMoneyUI.SetTimeUI();
+            MoneyUI.SetTimeUI();
         }
 
         if (!IsSteminaFull())
@@ -126,6 +154,6 @@ public class PlayerDataManager : PersistentSingleton<PlayerDataManager>
 
     public bool IsSteminaFull()
     {
-        return _stemina == MaxStemina;
+        return Stemina >= MaxStemina;
     }
 }
