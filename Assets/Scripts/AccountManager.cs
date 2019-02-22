@@ -20,6 +20,7 @@ public class AccountManager : MonoBehaviour
     public Text statusText;
     public AccountType accountType;
     public string webClientId = "<your client id here>";
+    public ServerManager server;
 
     private GoogleSignInConfiguration configuration;
 
@@ -103,6 +104,7 @@ public class AccountManager : MonoBehaviour
         if (!string.IsNullOrEmpty(result.Error))
         {
             AddStatusText("페이스북 에러: " + result.Error);
+            AddStatusText("페이스북 에러: " + result.RawResult);
         }
         else if (result.Cancelled)
         {
@@ -110,7 +112,8 @@ public class AccountManager : MonoBehaviour
         }
         else if (!string.IsNullOrEmpty(result.RawResult))
         {
-            AddStatusText("페이스북 성공: " + result.RawResult);
+            AddStatusText("페이스북 성공: " + AccessToken.CurrentAccessToken);
+            server.SendAccessToken(AccessToken.CurrentAccessToken.TokenString);
             accountType = AccountType.Facebook;
             SetButton();
             //ToastManager.Instance.ShowToastOnUiThread("페이스북 로그인 성공");
@@ -144,8 +147,16 @@ public class AccountManager : MonoBehaviour
                 AddStatusText("페이스북 로그아웃");
                 break;
             case AccountType.Google:
+                accountType = AccountType.None;
                 GoogleSignIn.DefaultInstance.SignOut();
-                AddStatusText("구글 로그아웃");
+                try
+                {
+                    AddStatusText("구글 로그아웃");
+                }
+                catch
+                {
+                    AddStatusText("구글 로그아웃 안되");
+                }
                 SetButton();
                 break;
         }
@@ -179,7 +190,8 @@ public class AccountManager : MonoBehaviour
         }
         else
         {
-            AddStatusText("구글 성공: " + task.Result.DisplayName);
+            AddStatusText("구글 성공: " + task.Result.IdToken);
+            server.SendAccessToken(task.Result.IdToken);
             accountType = AccountType.Google;
             SetButton();
             //ToastManager.Instance.ShowToastOnUiThread("구글 로그인 성공");
