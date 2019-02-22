@@ -44,7 +44,13 @@ public class AccountManager : MonoBehaviour
     {
         //AccountType[] tryes = { AccountType.Facebook, AccountType.Google };
 
-        TryAutoLogin(AccountType.Google);
+        TryAutoLogin(AccountType.Facebook);
+
+        if(accountType == AccountType.None)
+        {
+            TryAutoLogin(AccountType.Google);
+        }
+
         SetButton();
     }
 
@@ -65,6 +71,7 @@ public class AccountManager : MonoBehaviour
         switch (at)
         {
             case AccountType.Facebook:
+                FB.LogInWithReadPermissions(null, FacebookHandleResult);
                 break;
             case AccountType.Google:
                 // 구글 로그인 시도
@@ -81,7 +88,7 @@ public class AccountManager : MonoBehaviour
 
     public void FacebookLogin()
     {
-        LogOut();
+        //LogOut();
         try
         {
             FB.LogInWithReadPermissions(null, FacebookHandleResult);
@@ -113,7 +120,7 @@ public class AccountManager : MonoBehaviour
         else if (!string.IsNullOrEmpty(result.RawResult))
         {
             AddStatusText("페이스북 성공: " + AccessToken.CurrentAccessToken);
-            server.SendAccessToken(AccessToken.CurrentAccessToken.TokenString);
+            server.SendFacebookToken(AccessToken.CurrentAccessToken.TokenString);
             accountType = AccountType.Facebook;
             SetButton();
             //ToastManager.Instance.ShowToastOnUiThread("페이스북 로그인 성공");
@@ -126,11 +133,12 @@ public class AccountManager : MonoBehaviour
 
     public void GoogleLogin()
     {
-        LogOut();
+        //LogOut();
 
         GoogleSignIn.Configuration = configuration;
         GoogleSignIn.Configuration.UseGameSignIn = false;
-        GoogleSignIn.Configuration.RequestIdToken = true;
+        GoogleSignIn.Configuration.RequestAuthCode  = true;
+
         AddStatusText("구글 로그인 시도");
 
         GoogleSignIn.DefaultInstance.SignIn().ContinueWith(
@@ -190,16 +198,16 @@ public class AccountManager : MonoBehaviour
         }
         else
         {
-            AddStatusText("구글 성공: " + task.Result.IdToken);
-            server.SendAccessToken(task.Result.IdToken);
+            server.SendGoogleToken(task.Result.AuthCode);
             accountType = AccountType.Google;
+            AddStatusText("구글 성공: " + server.googleAccessToken);
             SetButton();
             //ToastManager.Instance.ShowToastOnUiThread("구글 로그인 성공");
         }
     }
     
     private List<string> messages = new List<string>();
-    void AddStatusText(string text)
+    public void AddStatusText(string text)
     {
         if (messages.Count == 8)
         {
