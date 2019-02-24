@@ -10,6 +10,9 @@ public class AccountManager : MonoBehaviour
 {
     public GameObject loginUI;
     public GameObject logoutUI;
+    public GameObject guestJoinUI;
+    public GameObject guestLoginUI;
+    public Text guestUserNumText;
     public Text statusText;
     public string webClientId = "<your client id here>";
     public ServerManager server;
@@ -45,6 +48,7 @@ public class AccountManager : MonoBehaviour
             AccountInfo.PlayerAccountType = AccountType.NotLogin;
         }
         */
+        AccountInfo.PlayerAccountType = AccountType.NotLogin;
         SetButton();
     }
 
@@ -130,6 +134,28 @@ public class AccountManager : MonoBehaviour
 
         GoogleSignIn.DefaultInstance.SignIn().ContinueWith(
           OnAuthenticationFinished);
+    }
+
+    public void GuestAccount()
+    {
+        int userNum = PlayerPrefs.GetInt("GuestID", 0);
+        if (userNum == 0)
+        {
+            // 게스트 계정 생성
+            guestJoinUI.SetActive(true);
+        }
+        else
+        {
+            // 게스트 로그인
+            guestLoginUI.SetActive(true);
+            guestUserNumText.text = "게스트 ID: " + userNum;
+        }
+    }
+
+    public void GuestLogin()
+    {
+        int userNum = PlayerPrefs.GetInt("GuestID", 0);
+        server.SendGuestLogin(userNum);
     }
 
     public void SetServerToken(string str)
