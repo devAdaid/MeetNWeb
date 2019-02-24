@@ -68,7 +68,7 @@ public class AccountManager : MonoBehaviour
                 // 구글 로그인 시도
                 AddStatusText("구글 자동 로그인 시도");
                 GoogleSignIn.Configuration = configuration;
-                GoogleSignIn.Configuration.UseGameSignIn = true;
+                GoogleSignIn.Configuration.UseGameSignIn = false;
                 GoogleSignIn.Configuration.RequestIdToken = true;
                 GoogleSignIn.DefaultInstance.SignInSilently()
                       .ContinueWith(OnAuthenticationFinished);
@@ -127,7 +127,7 @@ public class AccountManager : MonoBehaviour
         //LogOut();
 
         GoogleSignIn.Configuration = configuration;
-        GoogleSignIn.Configuration.UseGameSignIn = true;
+        GoogleSignIn.Configuration.UseGameSignIn = false;
         GoogleSignIn.Configuration.RequestAuthCode  = true;
 
         AddStatusText("구글 로그인 시도");
