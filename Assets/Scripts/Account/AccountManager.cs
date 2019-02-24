@@ -6,19 +6,11 @@ using Facebook.Unity;
 using UnityEngine.UI;
 using Google;
 
-public enum AccountType
-{
-    None,
-    Facebook,
-    Google,
-    Guest
-};
-
 public class AccountManager : MonoBehaviour
 {
-    public List<GameObject> accountBtns;
+    public GameObject loginUI;
+    public GameObject logoutUI;
     public Text statusText;
-    public AccountType accountType;
     public string webClientId = "<your client id here>";
     public ServerManager server;
 
@@ -28,7 +20,6 @@ public class AccountManager : MonoBehaviour
     // Can be set via the property inspector in the Editor.
     protected void Awake()
     {
-
         // 페이스북 초기화
         FB.Init();
 
@@ -43,42 +34,38 @@ public class AccountManager : MonoBehaviour
     private void Start()
     {
         //AccountType[] tryes = { AccountType.Facebook, AccountType.Google };
-
-        TryAutoLogin(AccountType.Facebook);
-
-        if(accountType == AccountType.None)
+        /*
+        try
         {
-            TryAutoLogin(AccountType.Google);
+            TryAutoLogin();
         }
-
+        catch
+        {
+            AddStatusText("자동로그인 실패");
+            AccountInfo.PlayerAccountType = AccountType.NotLogin;
+        }
+        */
         SetButton();
     }
 
-    private void SetButton()
+    public void SetButton()
     {
-        bool isLogined = (accountType != AccountType.None);
+        bool isLogined = (AccountInfo.PlayerAccountType != AccountType.NotLogin);
 
-        accountBtns[0].SetActive(!isLogined);
-        accountBtns[1].SetActive(!isLogined);
-        accountBtns[2].SetActive(!isLogined);
-        accountBtns[3].SetActive(isLogined);
+        loginUI.SetActive(!isLogined);
+        logoutUI.SetActive(isLogined);
     }
 
-    private void TryAutoLogin(AccountType at)
+    private void TryAutoLogin()
     {
-        accountType = AccountType.None;
-
-        switch (at)
+        switch (AccountInfo.PlayerAccountType)
         {
-            case AccountType.Facebook:
-                FB.LogInWithReadPermissions(null, FacebookHandleResult);
-                break;
             case AccountType.Google:
                 // 구글 로그인 시도
+                AddStatusText("구글 자동 로그인 시도");
                 GoogleSignIn.Configuration = configuration;
-                GoogleSignIn.Configuration.UseGameSignIn = false;
+                GoogleSignIn.Configuration.UseGameSignIn = true;
                 GoogleSignIn.Configuration.RequestIdToken = true;
-                AddStatusText("구글 자동로그인 시도");
                 GoogleSignIn.DefaultInstance.SignInSilently()
                       .ContinueWith(OnAuthenticationFinished);
                 
@@ -121,7 +108,7 @@ public class AccountManager : MonoBehaviour
         {
             AddStatusText("페이스북 성공: " + AccessToken.CurrentAccessToken);
             server.SendFacebookToken(AccessToken.CurrentAccessToken.TokenString);
-            accountType = AccountType.Facebook;
+            
             SetButton();
             //ToastManager.Instance.ShowToastOnUiThread("페이스북 로그인 성공");
         }
@@ -136,7 +123,7 @@ public class AccountManager : MonoBehaviour
         //LogOut();
 
         GoogleSignIn.Configuration = configuration;
-        GoogleSignIn.Configuration.UseGameSignIn = false;
+        GoogleSignIn.Configuration.UseGameSignIn = true;
         GoogleSignIn.Configuration.RequestAuthCode  = true;
 
         AddStatusText("구글 로그인 시도");
@@ -145,17 +132,22 @@ public class AccountManager : MonoBehaviour
           OnAuthenticationFinished);
     }
 
+    public void SetServerToken(string str)
+    {
+        AccountInfo.token = str;
+    }
+
     public void LogOut()
     {
         AddStatusText("로그아웃?");
-        switch (accountType)
+
+        switch (AccountInfo.PlayerAccountType)
         {
             case AccountType.Facebook:
                 FB.LogOut();
                 AddStatusText("페이스북 로그아웃");
                 break;
             case AccountType.Google:
-                accountType = AccountType.None;
                 GoogleSignIn.DefaultInstance.SignOut();
                 try
                 {
@@ -169,7 +161,7 @@ public class AccountManager : MonoBehaviour
                 break;
         }
 
-        accountType = AccountType.None;
+        AccountInfo.PlayerAccountType = AccountType.NotLogin;
         SetButton();
     }
 
@@ -199,8 +191,8 @@ public class AccountManager : MonoBehaviour
         else
         {
             server.SendGoogleToken(task.Result.AuthCode);
-            accountType = AccountType.Google;
-            AddStatusText("구글 성공: " + server.googleAccessToken);
+            //accountType = AccountType.Google;
+            AddStatusText("구글 성공: ");
             SetButton();
             //ToastManager.Instance.ShowToastOnUiThread("구글 로그인 성공");
         }
