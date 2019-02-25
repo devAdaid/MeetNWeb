@@ -9,4 +9,14 @@ public class MoveScene : MonoBehaviour
     {
         SceneManager.LoadScene(sceneName);
     }
+
+    public void CheckTokenAndMove(string sceneName)
+    {
+        if(AccountInfo.token == null)
+        {
+            return;
+        }
+
+        SceneManager.LoadScene(sceneName);
+    }
 }

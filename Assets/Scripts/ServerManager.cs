@@ -31,6 +31,7 @@ public delegate void MyDelegate(string str);
 
 public class ServerManager : MonoBehaviour
 {
+    public string authPath;
     public bool isTest = false;
     public AccountManager account;
     public Text log;
@@ -55,7 +56,7 @@ public class ServerManager : MonoBehaviour
     {
         logFunc("페북 토큰 전송: " + token);
         //loginType = AccountType.Facebook;
-        StartCoroutine("EmptyBodyUpload", "http://175.210.61.143:8080/social/login/facebook/" + token);
+        StartCoroutine("EmptyBodyUpload", authPath + "/social/login/facebook/" + token);
     }
 
     public void SendGoogleToken(string token)
@@ -69,7 +70,7 @@ public class ServerManager : MonoBehaviour
     public void SendGuestJoin()
     {
         logFunc("게스트 가입");
-        StartCoroutine("EmptyBodyUpload", "http://175.210.61.143:8080/join/guest");
+        StartCoroutine("EmptyBodyUpload", authPath + "/join/guest");
     }
 
     public void SendGuestLogin(int userNum)
@@ -109,7 +110,7 @@ public class ServerManager : MonoBehaviour
             Debug.Log("Form upload complete!");
             logFunc("Response:" + www.downloadHandler.text);
 
-            if(path == "http://175.210.61.143:8080/join/guest")
+            if(path == authPath + "/join/guest")
             {
                 int userNum = 0;
                 int.TryParse(www.downloadHandler.text, out userNum);
@@ -132,7 +133,7 @@ public class ServerManager : MonoBehaviour
         string body = "{\"guest_id\": \"" + userNum + "\"}";
         Debug.Log(body);
 
-        var www = new UnityWebRequest("http://175.210.61.143:8080/login/guest", "POST");
+        var www = new UnityWebRequest(authPath + "/login/guest", "POST");
         byte[] bodyRaw = Encoding.UTF8.GetBytes(body);
         www.uploadHandler = (UploadHandler)new UploadHandlerRaw(bodyRaw);
         www.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
@@ -189,7 +190,7 @@ public class ServerManager : MonoBehaviour
             //AddStatusText("G Response:" + www.downloadHandler.text);
             googleAccessToken = JsonUtility.FromJson<GoogleResponseData>(www.downloadHandler.text).access_token;
 
-            yield return EmptyBodyUpload("http://175.210.61.143:8080/social/login/google/" + googleAccessToken);
+            yield return EmptyBodyUpload(authPath + "/social/login/google/" + googleAccessToken);
         }
     }
 
@@ -202,7 +203,7 @@ public class ServerManager : MonoBehaviour
         string body = "{\"password\": \"" + pwdStr + "\",\"username\": \"" + idStr + "\"}";
         Debug.Log(body);
 
-        var www = new UnityWebRequest("http://175.210.61.143:8080/" + path, "POST");
+        var www = new UnityWebRequest(authPath + "/" + path, "POST");
         byte[] bodyRaw = Encoding.UTF8.GetBytes(body);
         www.uploadHandler = (UploadHandler)new UploadHandlerRaw(bodyRaw);
         www.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
