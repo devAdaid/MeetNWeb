@@ -37,7 +37,7 @@ public class NoticeManager : MonoBehaviour
 
     public void GetNoitice()
     {
-        StartCoroutine("EmptyBodyUpload", cmsPath + "/notice");
+        StartCoroutine("EmptyBodyUpload", ServerDefine.cmsServerRoot + "/notice");
     }
 
     public void OpenNotice()
