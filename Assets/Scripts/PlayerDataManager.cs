@@ -3,6 +3,27 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
+public struct UserData
+{
+    public int uid;
+    public int usernum;
+    public string nickname;
+    public string photo;
+    public int pushonoff;
+    public int gold;
+    public int ruby;
+    public int heart;
+    public int reset;
+    public string charge_at;
+
+    public override string ToString()
+    {
+        return "gold: " + gold;
+    }
+}
+
+
 public class PlayerDataManager : PersistentSingleton<PlayerDataManager>
 {
     #region getseter
@@ -22,7 +43,7 @@ public class PlayerDataManager : PersistentSingleton<PlayerDataManager>
             // 모든 스태미너 풀로 채워짐
             if (_stemina > MaxStemina)
             {
-                _stemina = MaxStemina;
+                //_stemina = MaxStemina;
             }
         }
     }
@@ -85,9 +106,10 @@ public class PlayerDataManager : PersistentSingleton<PlayerDataManager>
     }
     #endregion
 
-    public const int MaxStemina = 5;
+    public const int MaxStemina = 10;
     public DateTime currentTime;
     public TimeSpan steminaChargeTime;
+    public UserData userData = new UserData();
 
     private int _stemina = 0;
     private int _gold = 0;
@@ -99,12 +121,14 @@ public class PlayerDataManager : PersistentSingleton<PlayerDataManager>
     protected override void Initialize()
     {
         steminaChargeTime = new TimeSpan(0, 0, 10);
+        GeneralServerManager.Instance.GetResponse<UserData>(userData, "/detail/");
+        LoadingUIManager.Instance.WorkWithLoading(WaitForServer());
 
+        /*
         FirstSetting();
         MoneyUI.SetSteminaUI(Stemina, MaxStemina);
         MoneyUI.SetGoldUI(Gold);
         MoneyUI.SetCashUI(Cash);
-        /*
         if(!ES3.KeyExists("FirstRun"))
         {
             FirstSetting();
@@ -115,6 +139,17 @@ public class PlayerDataManager : PersistentSingleton<PlayerDataManager>
 
         }
         */
+    }
+
+    IEnumerator WaitForServer()
+    {
+        GeneralServerManager.Instance.isWorking = true;
+        yield return new WaitWhile(() => !GeneralServerManager.Instance.isWorking);
+        userData = (UserData)GeneralServerManager.Instance.result;
+        Gold = userData.gold;
+        Cash = userData.ruby;
+        Stemina = userData.heart;
+        //Debug.Log(userData.gold);
     }
 
     private void FirstSetting()

@@ -25,6 +25,23 @@ public class PersistentSingleton<T> : MonoBehaviour where T : Component
         }
     }
 
+    public static void CreateInstance()
+    {
+        if (_instance == null)
+        {
+            _instance = FindObjectOfType<T>();
+
+            if (_instance == null)
+            {
+                //스크립트 이름의 새 게임오브젝트 생성
+                GameObject newObj = new GameObject(typeof(T).FullName);
+                _instance = newObj.AddComponent<T>();
+
+                //DontDestroyOnLoad(newObj);
+            }
+        }
+    }
+
     protected virtual void Awake()
     {
         if (_instance == null)

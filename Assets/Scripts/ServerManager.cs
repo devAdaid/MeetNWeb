@@ -34,6 +34,8 @@ public class ServerManager : MonoBehaviour
     //public string ServerDefine.authServerRoot;
     public bool isTest = false;
     public AccountManager account;
+    public GameObject confirmUI;
+    public GameObject notconfirmUI;
     public Text log;
     public string googleAccessToken;
     private List<string> messages = new List<string>();
@@ -116,6 +118,7 @@ public class ServerManager : MonoBehaviour
                 int.TryParse(www.downloadHandler.text, out userNum);
                 PlayerPrefs.SetInt("GuestID", userNum);
                 PlayerPrefs.Save();
+                confirmUI.SetActive(true);
             }
             else
             {
@@ -201,7 +204,7 @@ public class ServerManager : MonoBehaviour
         //form.AddField("username", idStr);
 
         string body = "{\"password\": \"" + pwdStr + "\",\"username\": \"" + idStr + "\"}";
-        Debug.Log(body);
+        //Debug.Log(body);
 
         var www = new UnityWebRequest(ServerDefine.authServerRoot + "/" + path, "POST");
         byte[] bodyRaw = Encoding.UTF8.GetBytes(body);
@@ -231,9 +234,19 @@ public class ServerManager : MonoBehaviour
                 AccountInfo.PlayerAccountType = AccountType.Normal;
                 account.SetButton();
             }
-            else
+            else if(path == "join/account")
             {
-                logFunc("응답:" + www.downloadHandler.text);
+                if(www.downloadHandler.text=="success")
+                {
+                    logFunc("응답:" + www.downloadHandler.text);
+                    confirmUI.SetActive(true);
+                }
+                else
+                {
+                    ServerResponse<string> response = JsonUtility.FromJson<ServerResponse<string>>(www.downloadHandler.text);
+                    logFunc("응답:" + response.responseMessage);
+                    notconfirmUI.SetActive(true);
+                }
             }
 
             //토큰 설정

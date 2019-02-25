@@ -19,4 +19,9 @@ public class MoveScene : MonoBehaviour
 
         SceneManager.LoadScene(sceneName);
     }
+
+    public void SetPlayerDataManager()
+    {
+        PlayerDataManager.CreateInstance();
+    }
 }
