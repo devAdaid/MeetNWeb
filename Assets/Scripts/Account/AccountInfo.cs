@@ -8,7 +8,7 @@ public enum AccountType
     None,
     Facebook,
     Google,
-    Email,
+    Normal,
     Guest,
     NotLogin
 };

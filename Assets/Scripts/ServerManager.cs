@@ -79,18 +79,18 @@ public class ServerManager : MonoBehaviour
         StartCoroutine("GuestUpload", userNum);
     }
 
-    public void SendEmailLogin(string id, string pwd)
+    public void SendNormalLogin(string id, string pwd)
     {
         idStr = id;
         pwdStr = pwd;
-        StartCoroutine("EmailAccount", "login/account");
+        StartCoroutine("NormalAccount", "login/account");
     }
 
-    public void SendJoin(string id, string pwd)
+    public void SendNormalJoin(string id, string pwd)
     {
         idStr = id;
         pwdStr = pwd;
-        StartCoroutine("EmailAccount", "join/account");
+        StartCoroutine("NormalAccount", "join/account");
     }
 
     IEnumerator EmptyBodyUpload(string path)
@@ -194,7 +194,7 @@ public class ServerManager : MonoBehaviour
         }
     }
 
-    IEnumerator EmailAccount(string path)
+    IEnumerator NormalAccount(string path)
     {
         //WWWForm form = new WWWForm();
         //form.AddField("password", pwdStr);
@@ -228,7 +228,7 @@ public class ServerManager : MonoBehaviour
             {
                 TokenData tokenData = JsonUtility.FromJson<TokenData>(www.downloadHandler.text);
                 SetToken(tokenData.token);
-                AccountInfo.PlayerAccountType = AccountType.Email;
+                AccountInfo.PlayerAccountType = AccountType.Normal;
                 account.SetButton();
             }
             else

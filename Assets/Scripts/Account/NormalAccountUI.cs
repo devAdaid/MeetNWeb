@@ -14,13 +14,20 @@ public class NormalAccountUI : MonoBehaviour
 {
     public InputField idInput;
     public InputField pwdInput;
-    public MyAccountEvent uiEvent;
+    public MyAccountEvent joinEvent;
+    public MyAccountEvent loginEvent;
 
-    public void CallBack()
+    public void Join()
     {
         string idStr = idInput.text;
         string pwdStr = pwdInput.text;
-        uiEvent.Invoke(idStr, pwdStr);
+        joinEvent.Invoke(idStr, pwdStr);
     }
 
+    public void Login()
+    {
+        string idStr = idInput.text;
+        string pwdStr = pwdInput.text;
+        loginEvent.Invoke(idStr, pwdStr);
+    }
 }
