@@ -9,19 +9,19 @@ EditorBuildSettings:
     path: Assets/Scenes/Title.unity
     guid: 9e6f43cdddbeae74cb44563a13953d4e
   - enabled: 0
-    path: Assets/Scenes/Novel.unity
+    path: Assets/Scenes/NotUse/Novel.unity
     guid: d42deb2329eaac644a06b0ab328e5f30
   - enabled: 0
-    path: Assets/Scenes/WorldMap.unity
+    path: Assets/Scenes/NotUse/WorldMap.unity
     guid: 92af3d3963a991b4799c00fbfe179a1f
   - enabled: 1
     path: Assets/Scenes/Main.unity
     guid: 97a7f13ae0e6afd4ca083ed44a412246
   - enabled: 0
-    path: Assets/Scenes/Gacha.unity
+    path: Assets/Scenes/NotUse/Gacha.unity
     guid: 940d98abcc37d614a958842faf1d291f
   - enabled: 0
-    path: Assets/Scenes/Album.unity
+    path: Assets/Scenes/NotUse/Album.unity
     guid: f1dcc5eda1d60fe46afb33c366cbc607
   - enabled: 0
     path: Assets/SignInSample/MainScene.unity

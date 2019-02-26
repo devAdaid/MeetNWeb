@@ -82,7 +82,7 @@ public class AccountManager : MonoBehaviour
         //LogOut();
         try
         {
-            FB.LogInWithReadPermissions(new List<string>() { "public_profile", "email" }, FacebookHandleResult);
+            FB.LogInWithReadPermissions(null, FacebookHandleResult);
         }
         catch
         {
