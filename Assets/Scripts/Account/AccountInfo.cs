@@ -33,6 +33,7 @@ public class AccountInfo
             PlayerPrefs.Save();
         }
     }
+    public static string userId = null;
     public static string token = null;
 
     private static AccountType _playerAccountType = AccountType.None;

@@ -43,6 +43,7 @@ public class ServerManager : MonoBehaviour
 
     private string idStr;
     private string pwdStr;
+    public string userID;
     private AccountType loginType = AccountType.None;
 
     void Start()
@@ -57,14 +58,14 @@ public class ServerManager : MonoBehaviour
     public void SendFacebookToken(string token)
     {
         logFunc("페북 토큰 전송: " + token);
-        //loginType = AccountType.Facebook;
+        loginType = AccountType.Facebook;
         StartCoroutine("EmptyBodyUpload", ServerDefine.authServerRoot + "/social/login/facebook/" + token);
     }
 
     public void SendGoogleToken(string token)
     {
         logFunc("구글 토큰 전송: " + token);
-        //loginType = AccountType.Google;
+        loginType = AccountType.Google;
         //AddStatusText("구글 토큰 전송: " + token);
         StartCoroutine("GetFromGoogle", token);
     }
@@ -78,6 +79,7 @@ public class ServerManager : MonoBehaviour
     public void SendGuestLogin(int userNum)
     {
         logFunc("게스트 로그인: " + userNum);
+        loginType = AccountType.Guest;
         StartCoroutine("GuestUpload", userNum);
     }
 
@@ -124,6 +126,7 @@ public class ServerManager : MonoBehaviour
             {
                 SetToken(www.downloadHandler.text);
                 AccountInfo.PlayerAccountType = loginType;
+                AccountInfo.userId = userID;
             }
             account.SetButton();
             //AddStatusText("Response:" + www.downloadHandler.text);
@@ -162,6 +165,7 @@ public class ServerManager : MonoBehaviour
             TokenData tokenData = JsonUtility.FromJson<TokenData>(www.downloadHandler.text);
             SetToken(tokenData.token);
             AccountInfo.PlayerAccountType = AccountType.Guest;
+            AccountInfo.userId = userID;
             account.SetButton();
             //AddStatusText("Response:" + www.downloadHandler.text);
             //토큰 설정
@@ -232,6 +236,7 @@ public class ServerManager : MonoBehaviour
                 TokenData tokenData = JsonUtility.FromJson<TokenData>(www.downloadHandler.text);
                 SetToken(tokenData.token);
                 AccountInfo.PlayerAccountType = AccountType.Normal;
+                AccountInfo.userId = idStr;
                 account.SetButton();
             }
             else if(path == "join/account")

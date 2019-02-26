@@ -82,7 +82,7 @@ public class AccountManager : MonoBehaviour
         //LogOut();
         try
         {
-            FB.LogInWithReadPermissions(null, FacebookHandleResult);
+            FB.LogInWithReadPermissions(new List<string>() { "public_profile", "email" }, FacebookHandleResult);
         }
         catch
         {
@@ -111,6 +111,7 @@ public class AccountManager : MonoBehaviour
         else if (!string.IsNullOrEmpty(result.RawResult))
         {
             AddStatusText("페이스북 성공: " + AccessToken.CurrentAccessToken);
+            server.userID = AccessToken.CurrentAccessToken.UserId;
             server.SendFacebookToken(AccessToken.CurrentAccessToken.TokenString);
             
             SetButton();
@@ -155,6 +156,7 @@ public class AccountManager : MonoBehaviour
     public void GuestLogin()
     {
         int userNum = PlayerPrefs.GetInt("GuestID", 0);
+        server.userID = "Guest " + userNum;
         server.SendGuestLogin(userNum);
     }
 
@@ -216,6 +218,7 @@ public class AccountManager : MonoBehaviour
         }
         else
         {
+            server.userID = task.Result.DisplayName;
             server.SendGoogleToken(task.Result.AuthCode);
             //accountType = AccountType.Google;
             AddStatusText("구글 성공: ");
