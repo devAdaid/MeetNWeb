@@ -36,8 +36,8 @@ public class PlayerDataManager : PersistentSingleton<PlayerDataManager>
         set
         {
             _stemina = value;
-            PlayerPrefs.SetInt("Stemina", value);
-            PlayerPrefs.Save();
+            //PlayerPrefs.SetInt("Stemina", value);
+            //PlayerPrefs.Save();
             MoneyUI.SetSteminaUI(_stemina, MaxStemina);
 
             // 모든 스태미너 풀로 채워짐
@@ -52,14 +52,17 @@ public class PlayerDataManager : PersistentSingleton<PlayerDataManager>
     {
         get
         {
-            _gold = PlayerPrefs.GetInt("Gold");
+            //_gold = PlayerPrefs.GetInt("Gold");
             return _gold;
         }
         set
         {
+            int diff = value - _gold;
+            string body = "{\"gold\": " + diff + ",\"ruby\": " + 0 + "}";
             _gold = value;
-            PlayerPrefs.SetInt("Gold", value);
-            PlayerPrefs.Save();
+            //PlayerPrefs.SetInt("Gold", value);
+            //PlayerPrefs.Save();
+            server.Put("/detail/good", body);
             MoneyUI.SetGoldUI(_gold);
         }
     }
@@ -68,15 +71,29 @@ public class PlayerDataManager : PersistentSingleton<PlayerDataManager>
     {
         get
         {
-            _cash = PlayerPrefs.GetInt("Cash");
+            //_cash = PlayerPrefs.GetInt("Cash");
             return _cash;
         }
         set
         {
+            int diff = value - _cash;
+            string body = "{\"gold\": " + 0 + ",\"ruby\": " + diff + "}";
             _cash = value;
-            PlayerPrefs.SetInt("Cash", value);
-            PlayerPrefs.Save();
+            //PlayerPrefs.SetInt("Cash", value);
+            //PlayerPrefs.Save();
+            server.Put("/detail/good", body);
             MoneyUI.SetCashUI(_cash);
+        }
+    }
+
+    public string NickName
+    {
+        get { return _nickname; }
+        set
+        {
+            _nickname = value;
+            string body = "{\"nickname\": \"" + _nickname + "\"}";
+            server.Put("/detail/nick", body);
         }
     }
 
@@ -107,6 +124,7 @@ public class PlayerDataManager : PersistentSingleton<PlayerDataManager>
     #endregion
 
     public const int MaxStemina = 10;
+    public ServerConnect server;
     public DateTime currentTime;
     public TimeSpan steminaChargeTime;
     public UserData userData = new UserData();
@@ -114,14 +132,20 @@ public class PlayerDataManager : PersistentSingleton<PlayerDataManager>
     private int _stemina = 0;
     private int _gold = 0;
     private int _cash = 0;
+    private string _nickname = null;
     private DateTime _steminaUpdateTime;
     //public const long SteminaChargeTime = 100000000;
     private PlayerMoneyUI _PlayerMoneyUI = null;
 
     protected override void Initialize()
     {
+        if(server == null)
+        {
+            server = gameObject.AddComponent<ServerConnect>();
+        }
+
         steminaChargeTime = new TimeSpan(0, 0, 10);
-        GeneralServerManager.Instance.GetResponse<UserData>(userData, "/detail/");
+        server.GetResponse<UserData>("/detail/");
         LoadingUIManager.Instance.WorkWithLoading(WaitForServer());
 
         /*
@@ -143,12 +167,13 @@ public class PlayerDataManager : PersistentSingleton<PlayerDataManager>
 
     IEnumerator WaitForServer()
     {
-        GeneralServerManager.Instance.isWorking = true;
-        yield return new WaitWhile(() => !GeneralServerManager.Instance.isWorking);
-        userData = (UserData)GeneralServerManager.Instance.result;
+        server.isWorking = true;
+        yield return new WaitWhile(() => server.isWorking);
+        userData = (UserData)server.result;
         Gold = userData.gold;
         Cash = userData.ruby;
         Stemina = userData.heart;
+        NickName = userData.nickname;
         //Debug.Log(userData.gold);
     }
 

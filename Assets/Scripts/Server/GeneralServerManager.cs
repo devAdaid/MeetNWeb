@@ -11,7 +11,7 @@ public class ServerResponse<T>
     public T responseData;
 }
 
-public class GeneralServerManager:PersistentSingleton<GeneralServerManager>
+public class GeneralServerManager: PersistentSingleton<GeneralServerManager>
 {
     private string serverPath;
     public bool isWorking = false;

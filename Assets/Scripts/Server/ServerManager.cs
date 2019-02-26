@@ -156,9 +156,7 @@ public class ServerManager : MonoBehaviour
         }
         else
         {
-
-
-            Debug.Log("Form upload complete!");
+           // Debug.Log("Form upload complete!");
             logFunc("Response:" + www.downloadHandler.text);
 
 
@@ -192,7 +190,7 @@ public class ServerManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("Form upload complete!");
+            //Debug.Log("Form upload complete!");
             //logFunc("G Response:" + www.downloadHandler.text);
             //AddStatusText("G Response:" + www.downloadHandler.text);
             googleAccessToken = JsonUtility.FromJson<GoogleResponseData>(www.downloadHandler.text).access_token;
@@ -229,7 +227,7 @@ public class ServerManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("Form upload complete!");
+            //Debug.Log("Form upload complete!");
 
             if(path == "login/account")
             {
