@@ -133,6 +133,7 @@ public class PlayerDataManager : PersistentSingleton<PlayerDataManager>
     private int _gold = 0;
     private int _cash = 0;
     private string _nickname = null;
+    private string _heartTime;
     private DateTime _steminaUpdateTime;
     //public const long SteminaChargeTime = 100000000;
     private PlayerMoneyUI _PlayerMoneyUI = null;
@@ -145,8 +146,7 @@ public class PlayerDataManager : PersistentSingleton<PlayerDataManager>
         }
 
         steminaChargeTime = new TimeSpan(0, 0, 10);
-        server.GetResponse<UserData>("/detail/");
-        LoadingUIManager.Instance.WorkWithLoading(WaitForServer());
+        GetDataFromServer();
 
         /*
         FirstSetting();
@@ -165,15 +165,32 @@ public class PlayerDataManager : PersistentSingleton<PlayerDataManager>
         */
     }
 
+    public void GetDataFromServer()
+    {
+        server.GetResponse<UserData>("/detail/");
+        LoadingUIManager.Instance.WorkWithLoading(WaitForServer());
+    }
+
+    public void ConsumeHeart()
+    {
+        server.Put("/detail/heart/spend","");
+        GetDataFromServer();
+    }
+
     IEnumerator WaitForServer()
     {
         server.isWorking = true;
         yield return new WaitWhile(() => server.isWorking);
         userData = (UserData)server.result;
-        Gold = userData.gold;
-        Cash = userData.ruby;
-        Stemina = userData.heart;
-        NickName = userData.nickname;
+        _gold = userData.gold;
+        MoneyUI.SetGoldUI(_gold);
+        _cash = userData.ruby;
+        MoneyUI.SetCashUI(_cash);
+        _stemina = userData.heart;
+        MoneyUI.SetSteminaUI(_stemina, MaxStemina);
+        _nickname = userData.nickname;
+        _heartTime = userData.charge_at;
+        Debug.Log(_heartTime);
         //Debug.Log(userData.gold);
     }
 
@@ -193,7 +210,7 @@ public class PlayerDataManager : PersistentSingleton<PlayerDataManager>
         {
             MoneyUI.SetTimeUI();
         }
-
+        /*
         if (!IsSteminaFull())
         {
             TimeSpan diffTime = currentTime - SteminaUpdateTime;
@@ -208,8 +225,8 @@ public class PlayerDataManager : PersistentSingleton<PlayerDataManager>
             {
                 diffHour = MaxStemina;
             }
-            */
         }
+        */
     }
 
     public bool IsSteminaFull()

@@ -4,8 +4,18 @@ using UnityEngine;
 
 public class Test : MonoBehaviour
 {
-    public void AddMoney()
+    public void DiffMoney(int diff)
     {
-        PlayerDataManager.Instance.Gold += 1000;
+        PlayerDataManager.Instance.Gold += diff;
+    }
+
+    public void DiffRuby(int diff)
+    {
+        PlayerDataManager.Instance.Cash += diff;
+    }
+
+    public void Heart()
+    {
+        PlayerDataManager.Instance.ConsumeHeart();
     }
 }

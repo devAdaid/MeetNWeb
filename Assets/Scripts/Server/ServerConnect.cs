@@ -90,22 +90,54 @@ public class ServerConnect: MonoBehaviour
 
     IEnumerator PutWithToken(string body)
     {
-        var www = new UnityWebRequest(serverPath, "PUT");
-        byte[] bodyRaw = Encoding.UTF8.GetBytes(body);
-        www.uploadHandler = (UploadHandler)new UploadHandlerRaw(bodyRaw);
-        www.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
-        www.SetRequestHeader("Content-Type", "application/json");
-        www.SetRequestHeader("Authentiation", AccountInfo.token);
-        yield return www.SendWebRequest();
+        bool isNetworkError = false;
+        bool isHttpError = false;
+        string response = "";
 
-        if (www.isNetworkError || www.isHttpError)
+        if (body == "")
         {
-            Debug.Log(www.error);
+            List<IMultipartFormSection> formData = new List<IMultipartFormSection>();
+
+            UnityWebRequest www = UnityWebRequest.Post(serverPath, formData);
+            yield return www.SendWebRequest();
+
+            isNetworkError = www.isNetworkError;
+            isHttpError = www.isHttpError;
+
+            if(isNetworkError || isHttpError)
+            {
+                response = www.error;
+            }
+            else
+            {
+                response = www.downloadHandler.text;
+            }
         }
         else
         {
-            Debug.Log(www.downloadHandler.text);
+            var www = new UnityWebRequest(serverPath, "PUT");
+            byte[] bodyRaw = Encoding.UTF8.GetBytes(body);
+            www.uploadHandler = (UploadHandler)new UploadHandlerRaw(bodyRaw);
+            www.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
+            www.SetRequestHeader("Content-Type", "application/json");
+            www.SetRequestHeader("Authentiation", AccountInfo.token);
+            yield return www.SendWebRequest();
+
+            isNetworkError = www.isNetworkError;
+            isHttpError = www.isHttpError;
+
+            if (isNetworkError || isHttpError)
+            {
+                response = www.error;
+            }
+            else
+            {
+                response = www.downloadHandler.text;
+            }
         }
+        
+        Debug.Log(response);
+
         isWorking = false;
     }
 }
